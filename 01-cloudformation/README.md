@@ -355,9 +355,9 @@ Related topics to extend your knowledge about CloudFormation:
 
 1.3:
 
-sh labs1.3.1-Script.sh
+- sh labs1.3.1-Script.sh
  
-python labs1.3.2-1.3.3.py
+- python labs1.3.2-1.3.3.py
  
-python labs1.3.2-1.3.3.py delete
+- python labs1.3.2-1.3.3.py delete
 
