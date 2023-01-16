@@ -338,3 +338,26 @@ Related topics to extend your knowledge about CloudFormation:
 - Using [StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/what-is-cfnstacksets.html)
   to deploy a CloudFormation stack simultaneously across an array of
   AWS Account and Regions
+
+#### Commands
+
+1.1: 
+
+- aws cloudformation create-stack --stack-name teststack --template-body file://labs1.1.1-1.1.4-template.yaml --parameters file://labs1.1.1-1.1.4-params.json --region us-west-1
+
+- aws cloudformation list-stack-resources --stack-name teststack
+
+1.2:
+
+- aws cloudformation create-stack --stack-name teststack --template-body file://labs1.2.1-1.2.2-template --parameters file://labs1.2.1-1.2.2-params.json --capabilities CAPABILITY_NAMED_IAM
+
+- aws cloudformation create-stack --stack-name myteststack --template-body file://lab1.2.3-template.yaml --parameters file://lab1.2.3-params.json --capabilities CAPABILITY_NAMED_IAM
+
+1.3:
+
+sh labs1.3.1-Script.sh
+ 
+python labs1.3.2-1.3.3.py
+ 
+python labs1.3.2-1.3.3.py delete
+
