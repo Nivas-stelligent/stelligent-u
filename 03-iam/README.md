@@ -375,3 +375,20 @@ an S3 bucket.
 
 - Read through the [IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
   and be sure you're familiar with the ideas there.
+
+#### Commands
+
+3.1.1:
+- aws cloudformation create-stack --stack-name teststack --template-body file://lab3.1.1-template.yaml --capabilities CAPABILITY_NAMED_IAM
+
+3.1.3:
+- aws cloudformation create-stack --stack-name teststack --template-body file://lab3.1.3-template.yaml --capabilities CAPABILITY_NAMED_IAM
+
+3.1.4:
+- aws cloudformation create-stack --stack-name teststack --template-body file://lab3.1.4-template.yml --capabilities CAPABILITY_NAMED_IAM
+
+3.2.3:
+- aws cloudformation create-stack --stack-name teststack --template-body file://lab3.2.3-template.yaml --capabilities CAPABILITY_NAMED_IAM
+
+3.3.3:
+- aws cloudformation create-stack --stack-name teststack --template-body file://lab3.3.3-template.yaml --capabilities CAPABILITY_NAMED_IAM
