@@ -461,3 +461,45 @@ _Can you use different keys for different objects?_
   [Cross-Region Replication](https://docs.aws.amazon.com/AmazonS3/latest/dev/crr.html)
   offers a variety of useful benefits, like improved access speeds,
   cross-account ownership, and greater redundancy.
+
+#### Commands
+
+2.1.1:
+
+- aws s3api create-bucket --bucket stelligent-u-nivas --create-bucket-configuration LocationConstraint=us-west-2
+
+- aws s3api list-objects --bucket stelligent-u-nivas --region us-west-2
+
+2.1.2:
+
+- aws s3 cp data/testfile.docx s3://stelligent-u-nivas/Data/ --region us-west-2
+
+- aws s3 sync data/ s3://stelligent-u-nivas/Data/
+
+2.1.3:
+
+- aws s3 sync data/ s3://stelligent-u-nivas/Data/ --exclude "private.txt"
+
+2.2.1:
+
+- aws s3 sync data/ s3://stelligent-u-nivas/Data/ --acl public-read
+
+2.2.2:
+
+- aws s3 cp data/private.txt s3://stelligent-u-nivas/Data/ --acl bucket-owner-full-control
+
+2.2.3:
+
+- aws iam create-policy --policy-name nivas-policy --policy-document file://lab2.2.3-policy.json
+
+- aws iam attach-user-policy --policy-arn arn:aws:iam::324320755747:policy/nivas-policy --user-name Nivas.Rajendran.labs
+
+- aws s3api put-bucket-policy --bucket stelligent-u-nivas --policy file://lab2.2.3-bucketpolicy.json
+
+- aws s3 cp data/private.txt  s3://stelligent-u-nivas/data/ --acl authenticated-read
+
+2.4.2:
+
+- aws cloudformation create-stack --stack-name teststack --template-body file://labs2.2.4-2.4.2-template.yaml
+
+
