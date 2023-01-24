@@ -1,0 +1,18 @@
+[
+	{
+        "ParameterKey": "BucketName",
+        "ParameterValue": "stelligent-u-nivas"
+    },
+    {
+        "ParameterKey": "cidrBlock",
+        "ParameterValue": "10.1.0.0/16"
+    },
+    {
+        "ParameterKey": "Vpc1",
+        "ParameterValue": "vpc-01c11873b7752bc31"
+    },
+    {
+        "ParameterKey": "vpc1NetBlock",
+        "ParameterValue": "10.0.0.0/16"
+    }
+]

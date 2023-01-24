@@ -363,3 +363,25 @@ _How would you integrate your VPC with a corporate network?_
 - Jellili Adebello did a Sharing is Caring presentation about
   [Multiple VPC deployments with a pipeline](https://github.com/stelligent/multi-vpc-pipeline)
   on 2018-10-12.
+
+#### Commands
+
+4.1:
+
+- aws cloudformation create-stack --stack-name testVPCstack --template-body file://labs4.1.1-4.1.8-vpc-template.yml --parameters file://labs4.1.1-4.1.8-vpc-params.json
+
+- aws cloudformation create-stack --stack-name testEC2stack --template-body file://labs4.1.4-4.1.7-ec2-template.yaml --parameters file://labs4.1.4-4.1.7-ec2-params.json
+
+4.2.1:
+
+- aws cloudformation create-stack --stack-name testVPC2stack --template-body file://lab4.2.1-vpc2-template.yml --parameters file://labs4.2.1-vpc2-params.json --region us-east-2
+
+4.2.2:
+
+- aws cloudformation create-stack --stack-name testEC2stack --template-body file://lab4.2.2-ec2-template.yaml --parameters file://lab4.2.2-ec2-params.json --region us-east-2
+
+4.2.3:
+
+- aws s3api create-bucket --bucket stelligent-u-nivas --create-bucket-configuration LocationConstraint=us-east-2
+
+- aws s3api put-bucket-policy --bucket stelligent-u-nivas --policy file://lab4.2.3-bucketpolicy.json --region us-east-2

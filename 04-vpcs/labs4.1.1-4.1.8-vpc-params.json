@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "cidrBlock",
+        "ParameterValue": "10.0.0.0/16"
+    },
+	{
+        "ParameterKey": "vpc2NetBlock",
+        "ParameterValue": "10.1.0.0/16"
+    }
+]

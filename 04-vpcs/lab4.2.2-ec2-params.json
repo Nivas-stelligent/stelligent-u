@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "Nivas-stelligent-u-key-pair"
+    },
+    {
+        "ParameterKey": "Ec2AmiId",
+        "ParameterValue": "ami-0adc4758ea76442e2"
+    },
+    {
+        "ParameterKey": "T2InstanceType",
+        "ParameterValue": "t2.micro"
+    }
+]

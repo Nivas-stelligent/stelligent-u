@@ -1,0 +1,164 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EC2 instance for VPC stack
+
+Parameters:
+  KeyName:
+    Description: Key name for EC2
+    Type: String
+
+  Ec2AmiId:
+    Description: EC2 AMI ID
+    Type: String
+
+  T2InstanceType:
+    Description: EC2 instance type
+    Type: String  
+
+Resources:
+ 
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2AmiId
+      InstanceType: !Ref T2InstanceType
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - DeleteOnTermination: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref SecurityGroup
+          SubnetId:
+            !ImportValue
+              'testVPCstack-PrivateSubnet'
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-instance"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.5"
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SG for VPC
+      GroupName: EC2-SG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-sg"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.5"
+      VpcId:
+        !ImportValue
+          'testVPCstack-VPC'
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref Ec2Instance
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-eIP"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.6"
+
+ 
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: '10.0.1.0/24'
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-subnet2"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.7"
+      VpcId:
+        !ImportValue
+          testVPCstack-VPC
+  
+  Ec2Instance2:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2AmiId
+      InstanceType: !Ref T2InstanceType
+      KeyName: !Ref KeyName
+      NetworkInterfaces:
+        - DeleteOnTermination: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref SecurityGroup
+          SubnetId: !Ref Subnet2
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-stelligent-u-instance2"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.7"
+
+  RouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        !ImportValue
+          'testVPCstack-VPC'
+
+  Route2:   
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        !ImportValue
+          'testVPCstack-NatGateway'
+
+  SubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable2
+      SubnetId: !Ref Subnet2 
+  
+
+Outputs:
+  Ec2InstanceId:
+    Value: !Ref Ec2Instance
+    Export:
+      Name: !Sub ${AWS::StackName}-Ec2InstanceId
+
+  Ec2PrivateId:
+    Value: !GetAtt Ec2Instance.PrivateIp
+    Export:
+      Name: !Sub ${AWS::StackName}-Ec2PrivateId
+
+  PublicIp:
+    Value: !Ref ElasticIP
+    Export:
+      Name: !Sub ${AWS::StackName}-PublicIp
+

@@ -1,0 +1,208 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: VPC for labs 4.1
+
+Parameters:
+  cidrBlock:
+    Description: CIDR block for VPC
+    Type: String
+    
+  vpc2NetBlock:
+    Description: CIDR block of VPC
+    Type: String
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref cidrBlock
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-vpc"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.1"
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      CidrBlock: '10.0.0.0/24'
+      Tags:
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.1"
+      VpcId: !Ref VPC
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt ElasticIP.AllocationId
+      SubnetId: !Ref Subnet
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-natgateway"
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-eIP2"
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  Route1:  
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet
+
+  NetworkAclPublic:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-networkAclPublic"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.8"
+      VpcId: !Ref VPC
+
+  NetworkAclEntryPublicAll:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Egress: true
+      NetworkAclId: !Ref NetworkAclPublic
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 100
+
+  NetworkAclEntryPublicSsh:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: 164.221.120.252/32
+      NetworkAclId: !Ref NetworkAclPublic
+      PortRange:
+        From: 22
+        To: 22
+      Protocol: 6
+      RuleAction: allow
+      RuleNumber: 99
+
+  NetworkAclPrivate:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-networkAclPrivate"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.1"
+        - Key: "stelligent-u-lab"
+          Value: "4.1.8"
+      VpcId: !Ref VPC
+
+  NetworkAclEntryPrivateSsh:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: '10.0.0.0/24'
+      NetworkAclId: !Ref NetworkAclPrivate
+      PortRange:
+        From: 22
+        To: 22
+      Protocol: 6
+      RuleAction: allow
+      RuleNumber: 100
+
+  NetworkAclEntryPrivatePing:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: '10.0.0.0/24'
+      Icmp:
+        Code: -1
+        Type: -1
+      NetworkAclId: !Ref NetworkAclPrivate
+      Protocol: 1
+      RuleAction: allow
+      RuleNumber: 99
+
+  NetworkAclEntryPrivateHttp:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: '10.0.0.0/24'
+      NetworkAclId: !Ref NetworkAclPrivate
+      PortRange:
+        From: 80
+        To: 80
+      Protocol: 6
+      RuleAction: allow
+      RuleNumber: 98
+
+  NetworkAclEntryPrivateEgress:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: '10.0.0.0/24'
+      Egress: true
+      NetworkAclId: !Ref NetworkAclPrivate
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 97
+
+Outputs:
+  Vpc:
+    Description: Main VPC
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPC'
+
+  Subnet:
+    Description: Private subnet
+    Value: !Ref Subnet
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet'
+
+  NatGateway:
+    Description: NAT Gateway
+    Value: !Ref NatGateway
+    Export:
+      Name: !Sub '${AWS::StackName}-NatGateway'
+      
+  VpcNetblock:
+    Description: CIDR block of VPC-2
+    Value: !Ref cidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-VpcNetblock1'
+
+ 

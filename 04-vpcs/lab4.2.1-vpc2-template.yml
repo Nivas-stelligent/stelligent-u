@@ -1,0 +1,163 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Second VPC
+
+Parameters:
+  BucketName:
+    Description: Name of S3 bucket
+    Type: String
+    
+  cidrBlock:
+    Description: CIDR block in  VPC
+    Type: String
+
+  Vpc1:
+    Description: Id of VPC1
+    Type: String
+
+  vpc1NetBlock:
+    Description: CIDR block of VPC1
+    Type: String
+      
+Resources:
+  VPC2:
+    Type: AWS::EC2::VPC
+    Properties:
+      
+      CidrBlock: !Ref cidrBlock
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-vpc2"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.2"
+        - Key: "stelligent-u-lab"
+          Value: "4.2.1"
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: '10.1.2.0/24'
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-subnet"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.2"
+        - Key: "stelligent-u-lab"
+          Value: "4.2.1"
+      VpcId: !Ref VPC2
+
+ 
+  VPCPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      PeerRegion: 'us-east-1'
+      PeerVpcId: !Ref Vpc1
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-vpcPeeringConnection"
+      VpcId: !Ref VPC2
+
+  
+  NetworkAclPrivate:
+    Type: AWS::EC2::NetworkAcl
+    Properties:
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-networkAclPrivate"
+        - Key: "user"
+          Value: "Nivas.Rajendran.labs"
+        - Key: "stelligent-u-lesson"
+          Value: "4.2"
+        - Key: "stelligent-u-lab"
+          Value: "4.2.1"
+      VpcId: !Ref VPC2
+
+  NetworkAclEntryVpc2FromVpc1:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: !Ref vpc1NetBlock
+      NetworkAclId: !Ref NetworkAclPrivate
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 100
+
+  NetworkAclEntryVpcOut:
+    Type: AWS::EC2::NetworkAclEntry
+    Properties:
+      CidrBlock: 0.0.0.0/0
+      Egress: true
+      NetworkAclId: !Ref NetworkAclPrivate
+      Protocol: -1
+      RuleAction: allow
+      RuleNumber: 99
+
+ 
+
+  ElasticIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: "Name"
+          Value: "Nivas.Rajendran.labs-eIP2"
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC2
+
+  Route1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: !Ref vpc1NetBlock
+      VpcPeeringConnectionId: !Ref VPCPeeringConnection
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref Subnet
+
+  VpcEndpoint:
+    Type: "AWS::EC2::VPCEndpoint"
+    Properties:
+      VpcId: !Ref VPC2
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      RouteTableIds:
+        - !Ref RouteTable
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+              - 's3:PutObject'
+            Resource:
+              - !Sub "arn:aws:s3:::${BucketName}/*"
+              - !Sub "arn:aws:s3:::${BucketName}"
+Outputs:
+  Vpc:
+    Description: Main VPC
+    Value: !Ref VPC2
+    Export:
+      Name: !Sub '${AWS::StackName}-VPC2'
+
+  Subnet2:
+    Description: Private subnet
+    Value: !Ref Subnet
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnet2'
+
+  VpcNetblock:
+    Description: CIDR block of VPC-2
+    Value: !Ref cidrBlock
+    Export:
+      Name: !Sub '${AWS::StackName}-VpcNetblock2'
+

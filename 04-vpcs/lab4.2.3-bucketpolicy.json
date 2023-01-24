@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Access-to-specific-VPCE-And-VPC",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": ["s3:GetObject","s3:ListBucket","s3:PutObject"],
+            "Resource": ["arn:aws:s3:::stelligent-u-nivas","arn:aws:s3:::stelligent-u-nivas/*"]
+			"Condition": {
+               "StringEquals": {
+                   "aws:SourceVpc": "vpc-044c71b5a623ff730",
+                   "aws:SourceVpce": "vpce-0c89c174b5953116c"
+               }
+			}
+        }
+    ]
+}
